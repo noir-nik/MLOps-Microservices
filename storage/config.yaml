@@ -1,0 +1,19 @@
+service:
+  name: "storage"
+  port: 8002
+  host: "0.0.0.0"
+
+database:
+  url: "sqlite:///./db/storage.db"
+  path: "db/storage.db"
+
+storage:
+  data_dir: "data"
+  datasets_dir: "data/datasets"
+  models_dir: "data/models"
+  results_dir: "data/results"
+
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  log_file: "storage.log"

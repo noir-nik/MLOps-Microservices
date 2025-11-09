@@ -1,0 +1,14 @@
+service:
+  name: "web_master"
+  port: 8000
+  host: "0.0.0.0"
+
+services:
+  collector_url: "http://collector:8001"
+  storage_url: "http://storage:8002"
+  ml_service_url: "http://ml_service:8003"
+
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  log_file: "web_master.log"

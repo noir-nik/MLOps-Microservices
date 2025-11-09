@@ -1,0 +1,22 @@
+service:
+  name: "ml_service"
+  port: 8003
+  host: "0.0.0.0"
+
+services:
+  storage_url: "http://storage:8002"
+
+storage:
+  models_dir: "/app/data/models"
+  results_dir: "/app/data/results"
+
+models:
+  supported_types:
+    - "LogisticRegression"
+    - "RandomForest"
+    - "KNN"
+
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  log_file: "ml_service.log"

@@ -1,0 +1,13 @@
+service:
+  name: "collector"
+  port: 8001
+  host: "0.0.0.0"
+
+data:
+  source_path: "data/titanic.csv"
+  default_batch_size: 100
+
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  log_file: "collector.log"

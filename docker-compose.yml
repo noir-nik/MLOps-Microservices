@@ -1,0 +1,104 @@
+services:
+  collector:
+    build:
+      context: ./collector
+      dockerfile: Dockerfile
+    container_name: collector
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./collector/data:/app/data
+      - ./collector/logs:/app/logs
+    environment:
+      - SERVICE_NAME=collector
+      - SERVICE_PORT=8001
+    networks:
+      - ml_network
+    restart: unless-stopped
+
+  storage:
+    build:
+      context: ./storage
+      dockerfile: Dockerfile
+    container_name: storage
+    ports:
+      - "8002:8002"
+    volumes:
+      - storage_data:/app/data
+      - storage_db:/app/db
+      - ./storage/logs:/app/logs
+    environment:
+      - SERVICE_NAME=storage
+      - SERVICE_PORT=8002
+      - DATABASE_URL=sqlite:///./db/storage.db
+    networks:
+      - ml_network
+    restart: unless-stopped
+
+  ml_service:
+    build:
+      context: ./ml_service
+      dockerfile: Dockerfile
+    container_name: ml_service
+    ports:
+      - "8003:8003"
+    volumes:
+      - storage_data:/app/data
+      - ./ml_service/logs:/app/logs
+    environment:
+      - SERVICE_NAME=ml_service
+      - SERVICE_PORT=8003
+      - STORAGE_URL=http://storage:8002
+    networks:
+      - ml_network
+    depends_on:
+      - storage
+    restart: unless-stopped
+
+  web_master:
+    build:
+      context: ./web_master
+      dockerfile: Dockerfile
+    container_name: web_master
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./web_master/logs:/app/logs
+    environment:
+      - SERVICE_NAME=web_master
+      - SERVICE_PORT=8000
+      - COLLECTOR_URL=http://collector:8001
+      - STORAGE_URL=http://storage:8002
+      - ML_SERVICE_URL=http://ml_service:8003
+    networks:
+      - ml_network
+    depends_on:
+      - collector
+      - storage
+      - ml_service
+    restart: unless-stopped
+
+  viz:
+    build:
+      context: ./viz
+      dockerfile: Dockerfile
+    container_name: viz
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://web_master:8000
+      - VITE_WEB_MASTER_API=http://localhost:8000
+      - PUBLIC_API=http://web_master:8000
+    networks:
+      - ml_network
+    depends_on:
+      - web_master
+    restart: unless-stopped
+
+volumes:
+  storage_data:
+  storage_db:
+
+networks:
+  ml_network:
+    driver: bridge
